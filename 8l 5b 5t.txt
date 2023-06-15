@@ -1,0 +1,33 @@
+potential term output
+...........................
+t:| 4 || 5 || 1 || 2 || 3 |
+b:  3    2    1    5    4  
+   i h  e d  a j  g f   c b
+  u   \/   \/   \/   \/   \
+  \   /o   /o   /o   /o   /
+   \ o  \ /  \ o  \ /  \ o
+    /    /    /    /    /
+   / \  / u  / \  / u  / \
+  /   \/   \/   \/   \/   \
+  o   /o   /o   /o   /o   /
+   \ /  \ o  \ /  \ o  \ /
+    /    /    /    /    /
+   / u  / \  / u  / \  / u
+  /   \u   \u   \u   \u   \
+  o   /\   /\   /\   /\   /
+   \ /  \ /  \ o  \ /  \ /
+    /    /    /    /    /
+   / u  / u  / \  / u  / u
+  u   \/   \u   \u   \/   \
+  \   /o   /\   /\   /o   /
+   d c  j i  f e  b a  h g                      
+b:  3    2    1    5    4 
+t:| 4 || 5 || 1 || 2 || 3 |
+
+going to bottom, side = 0
+check same side going upstream
+downstream from other side
+
+going to top,
+check same side going upstream
+downstream from other side
