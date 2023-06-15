@@ -8,6 +8,8 @@ const bights = Number(args[3]);
 const teeth = Number(args[4]);
 const letters = 'abcdefghijklmnopqrstuvwxyz';
 const offset = 1 + (leads % 2);
+const padding = 2;// visual gaps between bights
+const pad = padding * (2 + (leads % 2));
 
 if (args.length != 5) {
     console.log(`missing required parameters
@@ -38,35 +40,35 @@ function getSteps(b, l, t) {
     let bight = 1;
     let tooth = 1;
     let rot = 0;
-    const h = (l * tstep) - 1;
-    const w = t * 2;
+    const h = (l+2*pad+(leads%2 === 0 ? -4 : -2*padding -2)) - 1;
+    // odd
+    // y = mx + b
+    // -6 = m(2) + b
+    // -8 = m(3) + b
+    // b = -6 -2m
+    // -8 = 3m - 6 - 2m
+    // -2 = m
+    // b = -6 + 4
+    // y = -2x - 2
+    // padding = 2 -> -6
+    // padding = 3 -> -8
+    // even
+    // y = mx + b
+    // 6 = m(5) + b
+    // 0 = m(2) + b
+    // b = -2m
+    // 6 = 5m - 2m
+    // 6 = 3m
+    // m = 2
+    // y = 2(padding) - 4
+    // padding = 5 -> +6
+    // padding = 4 -> +4
+    // padding = 3 -> +2
+    // padding = 2 -> +0
+    // padding = 1 -> -2
+    const w = b * pad;
     let knot = (() => {
-        const brow = () => {
-            let row = [];
-            let bight = 1;
-            for (let i = 0; i < w; i++) {
-                if (i % Math.round(t / b) === 0) {
-                    row.push(bight++);
-                } else {
-                    row.push(0);
-                }
-            }
-            return row;
-        };
-        const trow = () => {
-            let row = [];
-            let tooth = 1;
-            for (let i = 0; i < w; i++) {
-                if (i % 2 === 0) {
-                    row.push(tooth++);
-                } else {
-                    row.push(0);
-                }
-            }
-            return row;
-        };
         let out = [];
-        out.push(trow());
         for (let r = 0; r < h; r++) {
             let row = [];
             for (let c = 0; c < w; c++) {
@@ -74,7 +76,6 @@ function getSteps(b, l, t) {
             }
             out.push(row);
         }
-        out.push(trow());
         return out;
     })();
     console.log(knot);
@@ -98,11 +99,13 @@ function getSteps(b, l, t) {
         }
         const segId = getSeg(i);
         for (let j = 0; j < h; j++) {
-            let c = Math.round((tooth * 2) - (j+3));
+            let c = Math.round(((bight * pad) - (j+1+pad)) - (i * pad * (b - (1 + (l % 2)))));
+            // let c = Math.round(((bight * pad) - (j+1+pad)) - (i * pad * (b - 1)));
             while (c < 0) {
-                c += t*2;
+                c += b * pad;
             }
-            const r = Math.round((h+2)*(+!side)+(j+1)*(side ? 1 : -1));
+            const r = Math.round((h-1)*(+!side)+(j)*(side ? 1 : -1));
+            console.log({ r, c, bight });
             const cross = knot[r][c];
             const node = {
                 segId,
@@ -235,8 +238,23 @@ function printKnot(knot) {
         }
         return row;
     };
-    knot.push(brow(knot[0].length));
-    knot.splice(0, 0, brow(knot[0].length));
+    const trow = (w) => {
+        let row = [];
+        let tooth = 1;
+        for (let i = 0; i < w; i++) {
+            if (i % pad === 0) {
+                row.push(tooth++);
+            } else {
+                row.push(0);
+            }
+        }
+        return row;
+    };
+    const w = knot[0].length;
+    knot.push(brow(w));
+    knot.push(trow(w));
+    knot.splice(0, 0, trow(w));
+    knot.splice(0, 0, brow(w));
     knot.forEach((r, i) => {
         if (i <= 1 || i >= knot.length-2) {
             process.stdout.write(`${i === 0 || i === knot.length - 1 ? 'b:|' : 't:|'}`);
