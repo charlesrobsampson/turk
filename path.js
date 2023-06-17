@@ -57,8 +57,8 @@ function getSteps(b, l, t) {
         return out;
     })();
     console.log(knot);
-    // for (let i = 0; i < 5; i++) {
-    for (let i = 0; i < b * 2; i++) {
+    for (let i = 0; i < 5; i++) {
+    // for (let i = 0; i < b * 2; i++) {
         let pattern = [];
         let pass1 = 0;
         let next = {
@@ -67,7 +67,7 @@ function getSteps(b, l, t) {
             side: !side
         };
         next.bight -= l / 2;
-        next.tooth -= Math.round(tstep * bstep);
+        next.tooth -= Math.floor(tstep * bstep);
         while (next.tooth < 1) {
             next.tooth += t;
         }
@@ -84,7 +84,7 @@ function getSteps(b, l, t) {
                 c += b * pad;
             }
             const r = Math.round((h-1)*(+!side)+(j)*(side ? 1 : -1));
-            console.log({ r, c, bight });
+            // console.log({ r, c, bight });
             const cross = knot[r][c];
             const node = {
                 segId,
@@ -145,7 +145,7 @@ function getSteps(b, l, t) {
         bight = next.bight;
         tooth = next.tooth;
     }
-    console.dir(knot, { depth: null });
+    // console.dir(knot, { depth: null });
     printKnot(knot);
 }
 // getSteps(bights, leads, teeth);
@@ -220,16 +220,20 @@ function printKnot(knot) {
     const trow = (w, isOdd=false) => {
         const offset = isOdd ? 1 : 0;
         let row = [];
+        let other = isOdd;
         let tooth = 1 + Math.round(offset * tstep / 2);
         for (let i = 0; i < w; i++) {
-            // if ((i + (offset*Math.round(w/bights))) % (Math.round(w / teeth)*padding) === 0) {
-            if ((i + (offset - offset * Math.round(w / bights))) % Math.round(w / bights) === offset) {
-            // if (i % Math.round(w / bights) === offset * Math.round(tstep-0)) {
-                // WHY WON"T YOU SPLIT THE MIDDLE?!
+            if (i % Math.round((w / bights / (1 + offset))) === 0 && !other) {
                 row.push(Math.round(tooth));
-                tooth += tstep
+                tooth += tstep;
+                if (isOdd) {
+                    other = !other;
+                }
             } else {
                 row.push(0);
+                if (isOdd) {
+                    other = !other;
+                }
             }
         }
         return row;
