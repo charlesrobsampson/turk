@@ -38,7 +38,7 @@ function getSteps(b, l, t) {
     let side = true;
     let steps = {};
     let bight = 0;
-    let tooth = 1;
+    let tooth = 0;
     let rot = 0;
     // const h = (l+2*pad+(leads%2 === 0 ? -4 : -2*padding -4)) - 1;
     const h = (bstep * pad) - 1;
@@ -71,10 +71,11 @@ function getSteps(b, l, t) {
         // while (next.tooth < 1) {
         //     next.tooth += t;
         // }
-        while (next.bight < 1) {
+        while (next.bight < 0) {
             next.bight += b;
             pass1++;
         }
+			next.tooth = Math.round(next.bight * tstep);
         const segId = getSeg(i);
         for (let j = 0; j < h; j++) {
             // let c = Math.round(((bight * pad) - (j+1+pad)) - (i * pad * (b - (1 + (l % 2)))));
@@ -89,13 +90,13 @@ function getSteps(b, l, t) {
             const node = {
                 segId,
                 from: {
-                    tooth,
-                    bight,
+									tooth: tooth + 1,
+                    bight: bight + 1,
                     side
                 },
                 to: {
-                    tooth: next.tooth,
-                    bight: next.bight,
+                    tooth: next.tooth + 1,
+                    bight: next.bight + 1,
                     side: next.side
                 }
             };
