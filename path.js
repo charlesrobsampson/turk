@@ -8,8 +8,10 @@ const bights = Number(args[3]);
 const teeth = Number(args[4]);
 const letters = 'abcdefghijklmnopqrstuvwxyz';
 const offset = 1 + (leads % 2);
-const padding = 2;// visual gaps between bights
+const padding = 2// visual gaps between bights
 const pad = padding * (2 + (leads % 2));
+const tstep = teeth / bights;// number of teeth between bights
+const bstep = leads / 2;// number of bights to skip
 
 if (args.length != 5) {
     console.log(`missing required parameters
@@ -30,8 +32,6 @@ function getSteps(b, l, t) {
         console.log(`can't make turks head with ${b} bights and ${l} leads`);
         return;
     }
-    const tstep = t / b;// number of teeth between bights
-    const bstep = l / 2;// number of bights to skip
     const tob = (side) => {
         return side ? 'top' : 'bottom';
     };
@@ -40,32 +40,10 @@ function getSteps(b, l, t) {
     let bight = 1;
     let tooth = 1;
     let rot = 0;
-    const h = (l+2*pad+(leads%2 === 0 ? -4 : -2*padding -2)) - 1;
+    // const h = (l+2*pad+(leads%2 === 0 ? -4 : -2*padding -4)) - 1;
+    const h = (bstep * pad) - 1;
     // odd
-    // y = mx + b
-    // -6 = m(2) + b
-    // -8 = m(3) + b
-    // b = -6 -2m
-    // -8 = 3m - 6 - 2m
-    // -2 = m
-    // b = -6 + 4
-    // y = -2x - 2
-    // padding = 2 -> -6
-    // padding = 3 -> -8
-    // even
-    // y = mx + b
-    // 6 = m(5) + b
-    // 0 = m(2) + b
-    // b = -2m
-    // 6 = 5m - 2m
-    // 6 = 3m
-    // m = 2
-    // y = 2(padding) - 4
-    // padding = 5 -> +6
-    // padding = 4 -> +4
-    // padding = 3 -> +2
-    // padding = 2 -> +0
-    // padding = 1 -> -2
+    //  y = mx + b
     const w = b * pad;
     let knot = (() => {
         let out = [];
@@ -88,19 +66,20 @@ function getSteps(b, l, t) {
             tooth,
             side: !side
         };
-        next.bight += l / 2;
+        next.bight -= l / 2;
         next.tooth -= Math.round(tstep * bstep);
         while (next.tooth < 1) {
             next.tooth += t;
         }
-        while (next.bight > b) {
-            next.bight -= b;
+        while (next.bight < 1) {
+            next.bight += b;
             pass1++;
         }
         const segId = getSeg(i);
         for (let j = 0; j < h; j++) {
-            let c = Math.round(((bight * pad) - (j+1+pad)) - (i * pad * (b - (1 + (l % 2)))));
+            // let c = Math.round(((bight * pad) - (j+1+pad)) - (i * pad * (b - (1 + (l % 2)))));
             // let c = Math.round(((bight * pad) - (j+1+pad)) - (i * pad * (b - 1)));
+            let c = Math.round((bight-1) * pad) - (j + 1);
             while (c < 0) {
                 c += b * pad;
             }
@@ -227,23 +206,28 @@ function printKnot(knot) {
         let bight = 1;
         for (let i = 0; i < w; i++) {
             if (i % Math.round(w / bights) === 0) {
-                row.push(bight);
-                bight--;
-                while (bight < 1) {
-                    bight += bights;
-                }
+                row.push(bight++);
+                // bight--;
+                // while (bight < 1) {
+                //     bight += bights;
+                // }
             } else {
                 row.push(0);
             }
         }
         return row;
     };
-    const trow = (w) => {
+    const trow = (w, isOdd=false) => {
+        const offset = isOdd ? 1 : 0;
         let row = [];
-        let tooth = 1;
+        let tooth = 1 + Math.round(offset * tstep / 2);
         for (let i = 0; i < w; i++) {
-            if (i % pad === 0) {
-                row.push(tooth++);
+            // if ((i + (offset*Math.round(w/bights))) % (Math.round(w / teeth)*padding) === 0) {
+            if ((i + (offset - offset * Math.round(w / bights))) % Math.round(w / bights) === offset) {
+            // if (i % Math.round(w / bights) === offset * Math.round(tstep-0)) {
+                // WHY WON"T YOU SPLIT THE MIDDLE?!
+                row.push(Math.round(tooth));
+                tooth += tstep
             } else {
                 row.push(0);
             }
@@ -251,8 +235,8 @@ function printKnot(knot) {
         return row;
     };
     const w = knot[0].length;
+    knot.push(trow(w, leads % 2 === 1));
     knot.push(brow(w));
-    knot.push(trow(w));
     knot.splice(0, 0, trow(w));
     knot.splice(0, 0, brow(w));
     knot.forEach((r, i) => {
