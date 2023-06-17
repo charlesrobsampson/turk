@@ -37,7 +37,7 @@ function getSteps(b, l, t) {
     };
     let side = true;
     let steps = {};
-    let bight = 1;
+    let bight = 0;
     let tooth = 1;
     let rot = 0;
     // const h = (l+2*pad+(leads%2 === 0 ? -4 : -2*padding -4)) - 1;
@@ -67,10 +67,10 @@ function getSteps(b, l, t) {
             side: !side
         };
         next.bight -= l / 2;
-        next.tooth -= Math.floor(tstep * bstep);
-        while (next.tooth < 1) {
-            next.tooth += t;
-        }
+        // next.tooth -= Math.floor(tstep * bstep);
+        // while (next.tooth < 1) {
+        //     next.tooth += t;
+        // }
         while (next.bight < 1) {
             next.bight += b;
             pass1++;
