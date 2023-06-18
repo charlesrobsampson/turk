@@ -3,16 +3,25 @@
 // const teeth = 43;
 
 const args = process.argv;
-const leads = Number(args[2]);
-const bights = Number(args[3]);
-const teeth = Number(args[4]);
+const leads = Number(getArg('-l'));
+const bights = Number(getArg('-b'));
+const teeth = Number(getArg('-t'));
+const img = hasFlag('img');
 const letters = 'abcdefghijklmnopqrstuvwxyz';
 const offset = 1 + (leads % 2);
+const padding = 2// visual gaps between bights
+const pad = padding * (2 + (leads % 2));
+const tstep = teeth / bights;// number of teeth between bights
+const bstep = leads / 2;// number of bights to skip
 
-if (args.length != 5) {
+if (!leads || !bights || !teeth) {
     console.log(`missing required parameters
     usage:
-    node index.js <leads> <bights> <teeth>
+    node index.js -l <leads> -b <bights> -t <teeth> [img]
+    -l  number of leads         [required]
+    -b  number of bights        [required]
+    -t  number of teeths        [required]
+    img show pics of each step  [optional]
     `);
 } else {
     console.log(`steps to create turks head with
@@ -28,153 +37,176 @@ function getSteps(b, l, t) {
         console.log(`can't make turks head with ${b} bights and ${l} leads`);
         return;
     }
-    const tstep = t / b;
-    const bstep = l / 2;
     const tob = (side) => {
         return side ? 'top' : 'bottom';
     };
     let side = true;
     let steps = {};
-    let bight = 1;
-    let tooth = 1;
+    let bight = 0;
+    let tooth = 0;
     let rot = 0;
-    let segs = {
-        [tooth]: {
-            [+side]: {
-                0: {
-                    segment: getSeg(0),
-                    bight
-                }
+    // const h = (l+2*pad+(leads%2 === 0 ? -4 : -2*padding -4)) - 1;
+    const h = (bstep * pad) - 1;
+    // odd
+    //  y = mx + b
+    const w = b * pad;
+    let knot = (() => {
+        let out = [];
+        for (let r = 0; r < h; r++) {
+            let row = [];
+            for (let c = 0; c < w; c++) {
+                row.push(0);
             }
+            out.push(row);
         }
-    };
-
-    let s = tob(side);
+        return out;
+    })();
+    // console.log(knot);
     steps[0] = {
-        tooth,
-        bight,
-        side: s
+        tooth: tooth + 1,
+        bight: bight + 1,
+        side: tob(side),
+        pass1: 0
     };
-    side = !side;
-    console.log(steps[0]);
+    // for (let i = 0; i < 5; i++) {
     for (let i = 0; i < b * 2; i++) {
-        let around = false;
-        let last = tooth;
-        let pass1 = 0;
-        bight += l / 2;
-        tooth -= tstep * bstep;
-        let reportTooth = tooth;
-        // if (leads % 2 === 1) {
-        //     reportTooth += 
-        // }
-        while (tooth < 1) {
-            tooth += t;
-        }
-        while (bight > b) {
-            bight -= b;
-            rot++;
-            pass1++;
-            around = true;
-        }
-        s = tob(side);
-        if (segs[tooth]) {
-            segs[tooth][+side] = {
-                0: {
-                    segment: i+1 == b*2 ? getSeg(0) : getSeg(i + 1),
-                    bight
-                },
-                1: {
-                    segment: getSeg(i),
-                    bight
-                }
-            };
-        } else {
-            segs[tooth] = {
-                [+side]: {
-                    0: {
-                        segment: getSeg(i + 1),
-                        bight
-                    },
-                    1: {
-                        segment: getSeg(i),
-                        bight
-                    }
-                }
-            };
-        }
         let pattern = [];
-        let pattern2 = [];
-        let topHalf = [];
-        let bottomHalf = [];
-        let weave = side;
-        // loop through each tooth step to check if there's a bight on either side
-        for (j = 1; j <= bstep * offset; j++) {
-            let bightsAway = Math.floor(j / offset);
-            if (offset === 2) {
-                bightsAway += +!side;
-            }
-            console.log({
-                j,
-                bightsAway
-            });
-            let eval = Math.round(last - (j * (tstep / offset)));
-            while (eval < 1) {
-                eval += t;
-            }
-            console.log(`checking ${eval}`);
-            const nodes = segs[eval];// this means there are segments on this tooth
-            if (nodes) {
-                // segments on the same side as the destination
-                const sameSide = nodes[+side];
-                // segments on the other side from the destination
-                const diffSide = nodes[+!side];
-                if (sameSide && eval !== tooth) {
-                    // check for crossings on teeth on the same side as destination that are not the destination
-                    const dir = sameSide[0];
-                    if (dir) {
-                        console.log({
-                            sameSide
-                        });
-                        console.log(`going to side ${+side} tooth ${tooth} with ${getSeg(i)} go ${oou(bightsAway, side)}`, dir);
-                        // bottomHalf.push(oou(bightsAway, side));
-                        bottomHalf.splice(0, 0, oou(bightsAway, side));
-                        // add same side crosses to beginning of bottom half
-                    }
-                }
-                if (diffSide) {
-                    // check for crossings from teeth on the other side from destination
-                    const dir = diffSide[1];
-                    if (dir) {
-                        console.log({
-                            diffSide
-                        });
-                        console.log(`going to side ${+side} tooth ${tooth} with ${getSeg(i)} go ${oou(bightsAway, side)}`, dir);
-                        // topHalf.splice(0, 0, oou(bightsAway, side));
-                        topHalf.push(oou(bightsAway, side));
-                        // add other side crosses to end of top half
-                    }
-                }
-            }
-        }
-        for (j = 0; j < rot; j++) {
-            pattern.push(weave ? 'u' : 'o');
-            weave = !weave;
-        }
-        pattern2 = [...topHalf, ...bottomHalf];
-        steps[i + 1] = {
-            pass1,
-            tooth: Math.round(tooth),
+        let pass1 = 0;
+        let next = {
             bight,
-            side: s,
-            pattern: pattern.join(','),
-            pattern2: pattern2.join(',')
+            tooth,
+            side: !side
         };
-        console.log('step:', i+1);
-        console.log(steps[i+1]);
-        side = !side;
+        next.bight -= l / 2;
+        // next.tooth -= Math.floor(tstep * bstep);
+        // while (next.tooth < 1) {
+        //     next.tooth += t;
+        // }
+        while (next.bight < 0) {
+            next.bight += b;
+            pass1++;
+        }
+        next.tooth = Math.round(next.bight * tstep);
+        const segId = getSeg(i);
+        for (let j = 0; j < h; j++) {
+            // let c = Math.round(((bight * pad) - (j+1+pad)) - (i * pad * (b - (1 + (l % 2)))));
+            // let c = Math.round(((bight * pad) - (j+1+pad)) - (i * pad * (b - 1)));
+            let c = Math.round((bight) * pad) - (j + 1);
+            while (c < 0) {
+                c += b * pad;
+            }
+            const r = Math.round((h - 1) * (+!side) + (j) * (side ? 1 : -1));
+            // console.log({ r, c, bight });
+            const cross = knot[r][c];
+            const node = {
+                segId,
+                from: {
+                    tooth: tooth + 1,
+                    bight: bight + 1,
+                    side
+                },
+                to: {
+                    tooth: next.tooth + 1,
+                    bight: next.bight + 1,
+                    side: next.side
+                }
+            };
+            if (cross === 0) {
+                knot[r][c] = [node];
+            } else {
+                // console.dir({
+                //     evaluate: {
+                //         cross,
+                //         vs: node,
+                //         at: {
+                //             r,
+                //             c
+                //         }
+                //     }
+                // }, { depth: null });
+
+                // if going from top to bottom
+                // go under opposite and over same
+                // which means go under odd divisions of the (r + 1) / padding and over even divisions of (r + 1) / padding
+                // order least to greatest r
+                // if going from bottom to top
+                // go over opposite and under same
+                
+                // const isBig = cross[0].from.bight < node.from.bight;
+                // const isSame = cross[0].from.bight % 2 === (node.from.bight + +isBig) % 2
+                let pass;
+                const instance = Math.floor((r + 1) / (pad / padding));
+                if (node.from.side) {
+                    // from the top
+                    if (instance % 2 === 0) {
+                    // if (isSame) {
+                        // going over same
+                        knot[r][c].splice(0, 0, node);
+                        pass = 'o';
+                    } else {
+                        // going under opposite
+                        knot[r][c].push(node);
+                        pass = 'u';
+                    }
+                } else {
+                    // from the bottom
+                    if (instance % 2 === 0) {
+                    // if (isSame) {
+                        // going under same
+                        knot[r][c].push(node);
+                        pass = 'u';
+                    } else {
+                        // going over opposite
+                        knot[r][c].splice(0, 0, node);
+                        pass = 'o';
+                    }
+                }
+                pattern.push(pass);
+                // console.log({
+                //     instance,
+                //     even: instance % 2 === 0,
+                //     padding,
+                //     pass
+                // });
+            }
+        }
+        side = next.side;
+        bight = next.bight;
+        tooth = next.tooth;
+        steps[i+1] = {
+            segment: segId,
+            tooth: tooth + 1,
+            bight: bight + 1,
+            side: tob(side),
+            pass1,
+            pattern: pattern.join(',')
+        };
+        if (pattern.length < 1) {
+            delete steps[i+1].pattern;
+        }
+        if (img) {
+            console.log(`------step ${i+1}------`);
+            console.table({
+                from: {
+                    segment: segId,
+                    tooth: steps[i].tooth,
+                    bight: steps[i].bight,
+                    side: steps[i].side
+                },
+                to: {
+                    segment: segId,
+                    tooth: steps[i+1].tooth,
+                    bight: steps[i+1].bight,
+                    side: steps[i+1].side,
+                    pattern: steps[i+1].pattern ? steps[i+1].pattern : ''
+                }
+            });
+            printKnot(knot);
+        }
     }
-    console.log(steps);
-    console.dir(segs, { depth: null });
+    // console.dir(knot, { depth: null });
+    console.table(steps);
+    printKnot(knot);
 }
 // getSteps(bights, leads, teeth);
 
@@ -205,7 +237,7 @@ function oou(bightsAway, side) {
         return side ? 'o' : 'u';
     } else {
         // even bights away
-        if (offset === 2) {       
+        if (offset === 2) {
             return side ? 'o' : 'u';
         }
         return side ? 'u' : 'o';
@@ -228,6 +260,106 @@ function getSeg(step) {
     return s.join('');
 }
 
+function printKnot(knot) {
+    knot = JSON.parse(JSON.stringify(knot));
+    const brow = (w) => {
+        let row = [];
+        let bight = 1;
+        for (let i = 0; i < w; i++) {
+            if (i % Math.round(w / bights) === 0) {
+                row.push(bight++);
+                // bight--;
+                // while (bight < 1) {
+                //     bight += bights;
+                // }
+            } else {
+                row.push(0);
+            }
+        }
+        return row;
+    };
+    const trow = (w, isOdd = false) => {
+        const offset = isOdd ? 1 : 0;
+        let row = [];
+        let other = isOdd;
+        let tooth = 1 + Math.round(offset * tstep / 2);
+        for (let i = 0; i < w; i++) {
+            if (i % Math.round((w / bights / (1 + offset))) === 0 && !other) {
+                row.push(Math.round(tooth));
+                tooth += tstep;
+                if (isOdd) {
+                    other = !other;
+                }
+            } else {
+                row.push(0);
+                if (isOdd) {
+                    other = !other;
+                }
+            }
+        }
+        return row;
+    };
+    const w = knot[0].length;
+    knot.push(trow(w, leads % 2 === 1));
+    knot.push(brow(w));
+    knot.splice(0, 0, trow(w));
+    knot.splice(0, 0, brow(w));
+    knot.forEach((r, i) => {
+        if (i <= 1 || i >= knot.length - 2) {
+            process.stdout.write(`${i === 0 || i === knot.length - 1 ? 'b:|' : 't:|'}`);
+        } else {
+            process.stdout.write('  |');
+        }
+        r.forEach(c => {
+            let s = String(c);
+            if (typeof c === 'object') {
+                s = String(c[0].segId);
+            }
+            // console.log({c});
+            let txt;
+            if (s === '0') {
+                txt = '   ';
+            } else if (s.length === 1) {
+                txt = ` ${s} `;
+            } else {
+                txt = `${s} `;
+            }
+            process.stdout.write(txt);
+        });
+        process.stdout.write('|');
+        console.log();
+    });
+}
+
+function getSeg(step) {
+    let s = [];
+    let loops = 0;
+    while (step >= 0) {
+        if (step >= letters.length) {
+            s.push(letters[loops]);
+            loops++;
+            step -= letters.length;
+        } else {
+            s.push(letters[step]);
+            step -= letters.length;
+        }
+    }
+    return s.join('');
+}
+
+function getArg(tag) {
+    const i = process.argv.indexOf(tag);
+    return process.argv[i+1];
+}
+
+function hasFlag(flag) {   
+    const i = process.argv.indexOf(flag);
+    if (i !== -1) {
+        return true;
+    } else {
+        return false;
+    }
+}
 /* potential term output
 ...........................
 t:| 7 || 9 || 1 || 3 || 5 |
