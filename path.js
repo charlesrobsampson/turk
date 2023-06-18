@@ -75,22 +75,22 @@ function getSteps(b, l, t) {
             next.bight += b;
             pass1++;
         }
-			next.tooth = Math.round(next.bight * tstep);
+        next.tooth = Math.round(next.bight * tstep);
         const segId = getSeg(i);
         for (let j = 0; j < h; j++) {
             // let c = Math.round(((bight * pad) - (j+1+pad)) - (i * pad * (b - (1 + (l % 2)))));
             // let c = Math.round(((bight * pad) - (j+1+pad)) - (i * pad * (b - 1)));
-            let c = Math.round((bight-1) * pad) - (j + 1);
+            let c = Math.round((bight) * pad) - (j + 1);
             while (c < 0) {
                 c += b * pad;
             }
-            const r = Math.round((h-1)*(+!side)+(j)*(side ? 1 : -1));
+            const r = Math.round((h - 1) * (+!side) + (j) * (side ? 1 : -1));
             // console.log({ r, c, bight });
             const cross = knot[r][c];
             const node = {
                 segId,
                 from: {
-									tooth: tooth + 1,
+                    tooth: tooth + 1,
                     bight: bight + 1,
                     side
                 },
@@ -178,7 +178,7 @@ function oou(bightsAway, side) {
         return side ? 'o' : 'u';
     } else {
         // even bights away
-        if (offset === 2) {       
+        if (offset === 2) {
             return side ? 'o' : 'u';
         }
         return side ? 'u' : 'o';
@@ -218,7 +218,7 @@ function printKnot(knot) {
         }
         return row;
     };
-    const trow = (w, isOdd=false) => {
+    const trow = (w, isOdd = false) => {
         const offset = isOdd ? 1 : 0;
         let row = [];
         let other = isOdd;
@@ -245,7 +245,7 @@ function printKnot(knot) {
     knot.splice(0, 0, trow(w));
     knot.splice(0, 0, brow(w));
     knot.forEach((r, i) => {
-        if (i <= 1 || i >= knot.length-2) {
+        if (i <= 1 || i >= knot.length - 2) {
             process.stdout.write(`${i === 0 || i === knot.length - 1 ? 'b:|' : 't:|'}`);
         } else {
             process.stdout.write('  |');
