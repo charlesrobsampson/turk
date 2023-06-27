@@ -1,7 +1,3 @@
-// const bights = 13;
-// const leads = 6;
-// const teeth = 43;
-
 const args = process.argv;
 const leads = Number(getArg('-l'));
 const bights = Number(getArg('-b'));
@@ -32,7 +28,7 @@ if (!leads || !bights || !teeth) {
     getSteps(bights, leads, teeth);
 }
 
-function getSteps(b, l, t) {
+function getSteps(b, l) {
     if (hasCommonDenominator(b, l)) {
         console.log(`can't make turks head with ${b} bights and ${l} leads`);
         return;
@@ -44,11 +40,7 @@ function getSteps(b, l, t) {
     let steps = {};
     let bight = 0;
     let tooth = 0;
-    let rot = 0;
-    // const h = (l+2*pad+(leads%2 === 0 ? -4 : -2*padding -4)) - 1;
     const h = (bstep * pad) - 1;
-    // odd
-    //  y = mx + b
     const w = b * pad;
     let knot = (() => {
         let out = [];
@@ -61,14 +53,12 @@ function getSteps(b, l, t) {
         }
         return out;
     })();
-    // console.log(knot);
     steps[0] = {
         tooth: tooth + 1,
         bight: bight + 1,
         side: tob(side),
         pass1: 0
     };
-    // for (let i = 0; i < 5; i++) {
     for (let i = 0; i < b * 2; i++) {
         let pattern = [];
         let pass1 = 0;
@@ -78,10 +68,6 @@ function getSteps(b, l, t) {
             side: !side
         };
         next.bight -= l / 2;
-        // next.tooth -= Math.floor(tstep * bstep);
-        // while (next.tooth < 1) {
-        //     next.tooth += t;
-        // }
         while (next.bight < 0) {
             next.bight += b;
             pass1++;
@@ -89,14 +75,11 @@ function getSteps(b, l, t) {
         next.tooth = Math.round(next.bight * tstep);
         const segId = getSeg(i);
         for (let j = 0; j < h; j++) {
-            // let c = Math.round(((bight * pad) - (j+1+pad)) - (i * pad * (b - (1 + (l % 2)))));
-            // let c = Math.round(((bight * pad) - (j+1+pad)) - (i * pad * (b - 1)));
             let c = Math.round((bight) * pad) - (j + 1);
             while (c < 0) {
                 c += b * pad;
             }
             const r = Math.round((h - 1) * (+!side) + (j) * (side ? 1 : -1));
-            // console.log({ r, c, bight });
             const cross = knot[r][c];
             const node = {
                 segId,
@@ -114,26 +97,6 @@ function getSteps(b, l, t) {
             if (cross === 0) {
                 knot[r][c] = [node];
             } else {
-                // console.dir({
-                //     evaluate: {
-                //         cross,
-                //         vs: node,
-                //         at: {
-                //             r,
-                //             c
-                //         }
-                //     }
-                // }, { depth: null });
-
-                // if going from top to bottom
-                // go under opposite and over same
-                // which means go under odd divisions of the (r + 1) / padding and over even divisions of (r + 1) / padding
-                // order least to greatest r
-                // if going from bottom to top
-                // go over opposite and under same
-                
-                // const isBig = cross[0].from.bight < node.from.bight;
-                // const isSame = cross[0].from.bight % 2 === (node.from.bight + +isBig) % 2
                 let pass;
                 const instance = Math.floor((r + 1) / (pad / padding));
                 if (node.from.side) {
@@ -162,12 +125,6 @@ function getSteps(b, l, t) {
                     }
                 }
                 pattern.push(pass);
-                // console.log({
-                //     instance,
-                //     even: instance % 2 === 0,
-                //     padding,
-                //     pass
-                // });
             }
         }
         side = next.side;
@@ -204,11 +161,9 @@ function getSteps(b, l, t) {
             printKnot(knot);
         }
     }
-    // console.dir(knot, { depth: null });
     console.table(steps);
     printKnot(knot);
 }
-// getSteps(bights, leads, teeth);
 
 function hasCommonDenominator(a, b) {
     // Find the absolute values of a and b
@@ -268,10 +223,6 @@ function printKnot(knot) {
         for (let i = 0; i < w; i++) {
             if (i % Math.round(w / bights) === 0) {
                 row.push(bight++);
-                // bight--;
-                // while (bight < 1) {
-                //     bight += bights;
-                // }
             } else {
                 row.push(0);
             }
@@ -315,7 +266,6 @@ function printKnot(knot) {
             if (typeof c === 'object') {
                 s = String(c[0].segId);
             }
-            // console.log({c});
             let txt;
             if (s === '0') {
                 txt = '   ';
