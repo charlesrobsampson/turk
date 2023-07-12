@@ -46,6 +46,7 @@ steps to create turks head with
     5 bights
     3 leads
     on a jig with 10 teeth
+    wrap going clockwise
     
 ┌─────────┬───────┬───────┬──────────┬───────┬─────────┬─────────┐
 │ (index) │ tooth │ bight │   side   │ pass1 │ segment │ pattern │
@@ -117,4 +118,30 @@ b:| 1                 2                 3                 4                 5   
 The `...` signify that each step will print a very similar image, just with the next segment added. The steps follow the same idea as the final table with all steps, however, this only shows the new step in the image. This will also output the full table and final image at the very end.
 
 ## Making your own jig
-Coming soon
+Here's my current jig
+![jig](imgs/jig.jpg)
+It's about 5.5 in tall with a diameter of 1.5 in.
+
+It has 63 teeth that are about 2 mm wide and about .5 in tall. Sorry for the mixed units, but not really, deal with it.
+
+### the jig
+I used the plastic tube that the s-lon thread I was using for the ring came in, why? Cuz it was convenient.
+![s-lon tube](imgs/slontube.jpg)
+Pretty much any tube (Smart Water bottle, PVC pipe, soda can [maybe kinda sharp for this], shapmoo bottle, whatever) that is a reasonable size for what you're hoping to make will work. Well, make sure it's not super thick since that would make creating the teeth a nightmare (PVC might be too thick unless you have some good tools).
+
+I had originally made one out of a toilet paper tube, but it didn't last very long since it's cardboard, so I wouldn't recommend it. If you're in a pinch though and you really need a jig to make a turks head, do it. Also, email the details of the scenario for that, I'm curious.
+
+Measure the circumference of your tube of choice and then find a measurement that makes the teeth wide enough but also gives you enough teeth to handle your needs. The isnpiration for this came from researching other solutions for jigs and I didn't like any of them. You had to either set up your jig (oh, also buy one, pfff) specific to the Turk's head you wanted to make or print out a pattern to tape onto a tube... but I ain't got no printer. So here we are.
+
+Once you have determined the width of your teeth, measure around the tube and mark where all the teeth should be. I used a fabric measuring tape and taped it to one spot and the wrapped it around the tube and marked every 2 mm with a Sharpie, but you do you. Flip it over and do it to the other side. I tried my eyeballest best to draw a line straight down the cylinder to start the teeth at the same spot. This doesn't really need to be straight, nor is it really necessary. It was just kinda nice to use to mark when I was going around the tube.
+
+After the teeth are marked you can go about cutting them with your favorite cutting tool (I used scissors). Before I cut mine, I made a line around the ends to try and cut to these. I laid the Sharpie on a table and stood the tube on one end and rolled it to get an even line on each end. If you pay close attention to the image of the jig, I didn't use that line. It was too close to the end for the teeth to be effective so then I re-cut all the teeth to about 1/2 in. You could try and get a line to cut to or just eyeball it. Whatever you wanna do. This is just a knot after all.
+
+Once you have your teeth cut, or before... I don't really care, I would recommend marking numbers for your teeth starting with the line that goes top to bottom. I have bad handwriting and a fat Sharpie so I could only fit numbers for every third tooth. As you can see, the numbering goes `1..4..7..10` I put the first digit of double digit numbers on top and then the ones place below it to conserve horizontal space... but yeah, you do you. You just want to be able to know which tooth is where.
+
+Boom! There you have it!
+
+If you want to see the other options I'm talking about you can just [Google some Turk's Head Jigs](https://www.google.com/search?q=turks+head+jig) or check out [this website](http://www.folsoms.net/knots/tejay/index.htm) that talks about how to use a pattern on any old tube to make one. I actually used this website a ton when writing this code, so super props to this Folsom guy.
+
+### the shuttle
+coming soon

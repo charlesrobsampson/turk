@@ -24,6 +24,7 @@ if (!leads || !bights || !teeth) {
     ${bights} bights
     ${leads} leads
     on a jig with ${teeth} teeth
+    wrap going clockwise
     `);
     getSteps(bights, leads, teeth);
 }
